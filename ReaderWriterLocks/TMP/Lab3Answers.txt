@@ -1,0 +1,9 @@
+1. The priority inversion problem could cause that a higher-priority process needs to wait for the completion of a lower-priority process.
+
+	1.Priority inheritance is one approach to address this issue. Please give another approach and briefly describe its idea.
+	A: Priority ceiling is another approach to address this issue. With priority ceilings, the shared mutex process has a characteristic (high) priority of its own,	   which is assigned to the task locking the mutex. Provided the other high priority task(s) that tries to access the mutex does not have a priority higher than 	   the ceiling priority it works well.
+
+2. Synchronization is a quite complex issue in operating systems. To show your understanding about process synchronization, you are asked to point out a reader/writer  synchronization issue in this pesudo-code: task2_sync_issue.c. Multiple reader threads can execute this code concurrently by calling do_update. All the variables       starting with global_ are global variables. You are asked to describe the potential issue caused by the incorrect synchronization and point out at least one possible   thread interleaving that would trigger the problem.
+A: In the given code, the data global_buf is available globally to all the threads. Hence, it causes a problem when any two threads simultaneously modify the same data.Thread interleaving causes a problem when buffer_add is performed. The buffer_add function uses the previous value of buflen, adds 'size' argument to update. Now, if a new thread reaches this part of code while the old thread is still blocked at performing the update to buflen, then the buflen value used by the new thread is 
+incorrect. To avoid such problems, there should be mutual exclusion between the threads for such globally used critical sections.    
+

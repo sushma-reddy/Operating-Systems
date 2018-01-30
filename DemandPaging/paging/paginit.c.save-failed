@@ -1,0 +1,54 @@
+/* spoondr */
+
+#include <conf.h>
+#include <kernel.h>
+#include <proc.h>
+#include <stdio.h>
+#include <paging.h>
+
+pt_t *global_pt[4];    /* global page tables */
+
+int init_globalpt(){
+}
+
+pt_t *get_pgt(void)
+{
+    pt_t pte[NFRAMES];
+    int fr_id = 0;
+    STATWORD ps;
+    disable(ps);
+
+    fr_id = get_frm();
+    if (fr_id == SYSERR) {
+        kprintf("No free frames available!!");
+        restore(ps);
+        kill(getpid());
+        return SYSERR;
+    }
+
+    /* Frames are initialized */
+    frm_tab[fr_id].fr_status = FRM_MAPPED;
+    frm_tab[fr_id].fr_pid = pid;
+    frm_tab[fr_id].fr_vpno = -1;
+    frm_tab[fr_id].fr_type = FR_TBL;
+
+    pte = (pt_t *) ((fr_ptr->fr_id +FRAME0)*NBPG);
+
+    /* Initialize the Page Table entries of page frame*/
+    for (i=0; i < NFRAMES ; i++) {
+        pte[i].pt_pres = 0;
+        pte[i].pt_write = 0;
+        pte[i].pt_user = 0;
+        pte[i].pt_pwt = 0;
+        pte[i].pt_pcd = 0;
+        pte[i].pt_acc = 0;
+        pte[i].pt_dirty = 0;
+        pte[i].pt_mbz = 0;
+        pte[i].pt_global = 0;
+        pte[i].pt_avail = 0;
+        pte[i].pt_base = 0;
+    }
+
+    restore(ps);
+    return pte;
+}
